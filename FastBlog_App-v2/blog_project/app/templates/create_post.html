@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Post - FastAPI Blog{% endblock %}
+
+{% block description %}Share your thoughts and create a new blog post{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <!-- Page Header -->
+        <div class="text-center mb-4">
+            <h1 class="display-5 fw-bold text-primary">
+                <i class="bi bi-plus-circle me-2"></i>
+                Create New Post
+            </h1>
+            <p class="lead text-muted">Share your thoughts and stories with our community</p>
+            <hr class="my-4">
+        </div>
+
+        <!-- Create Post Form -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-journal-text me-2"></i>
+                    Post Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/create-post" id="createPostForm">
+                    <div class="row g-4">
+                        <!-- Post Title -->
+                        <div class="col-12">
+                            <label for="title" class="form-label fw-semibold">
+                                <i class="bi bi-card-heading me-1"></i>
+                                Post Title *
+                            </label>
+                            <input type="text" 
+                                   class="form-control form-control-lg" 
+                                   id="title" 
+                                   name="title" 
+                                   required 
+                                   placeholder="Enter an engaging title for your post"
+                                   maxlength="200"
+                                   autocomplete="off">
+                            <div class="form-text">
+                                <span id="titleCounter">200 characters remaining</span>
+                            </div>
+                        </div>
+
+                        <!-- Author Name -->
+                        <div class="col-md-6">
+                            <label for="author" class="form-label fw-semibold">
+                                <i class="bi bi-person-circle me-1"></i>
+                                Author Name *
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="author" 
+                                   name="author" 
+                                   required 
+                                   placeholder="Your name"
+                                   maxlength="100"
+                                   autocomplete="name">
+                            <div class="form-text">
+                                <span id="authorCounter">100 characters remaining</span>
+                            </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="col-12">
+                            <label for="content" class="form-label fw-semibold">
+                                <i class="bi bi-journal-text me-1"></i>
+                                Post Content *
+                            </label>
+                            <textarea class="form-control" 
+                                      id="content" 
+                                      name="content" 
+                                      rows="12" 
+                                      required 
+                                      placeholder="Write your post content here... Share your thoughts, experiences, or stories. You can use line breaks to separate paragraphs."
+                                      style="resize: vertical;"></textarea>
+                            <div class="form-text">
+                                <span id="contentCounter">0 characters</span>
+                                <span class="ms-3">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Tip: Use line breaks to create paragraphs
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="col-12">
+                            <div class="d-flex gap-3 justify-content-between">
+                                <div>
+                                    <a href="/" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left me-2"></i>
+                                        Cancel
+                                    </a>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-outline-info" id="previewBtn">
+                                        <i class="bi bi-eye me-2"></i>
+                                        Preview
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-send me-2"></i>
+                                        Publish Post
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Writing Tips Card -->
+        <div class="card border-0 bg-light mt-4">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="bi bi-lightbulb text-warning me-2"></i>
+                    Writing Tips
+                </h6>
+                <ul class="card-text small mb-0">
+                    <li>Choose a clear and engaging title that summarizes your post</li>
+                    <li>Start with an interesting opening that hooks your readers</li>
+                    <li>Use short paragraphs to make your content easy to read</li>
+                    <li>End with a conclusion or call-to-action</li>
+                    <li>Proofread your content before publishing</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewModalLabel">
+                    <i class="bi bi-eye me-2"></i>
+                    Post Preview
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <article class="preview-content">
+                    <h2 id="previewTitle" class="text-primary mb-3"></h2>
+                    <div class="text-muted mb-3">
+                        <i class="bi bi-person-circle me-1"></i>
+                        By <strong id="previewAuthor"></strong>
+                        <span class="mx-2">•</span>
+                        <i class="bi bi-calendar-event me-1"></i>
+                        <span id="previewDate"></span>
+                    </div>
+                    <div id="previewContentText" class="preview-text"></div>
+                </article>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-pencil me-2"></i>
+                    Continue Editing
+                </button>
+                <button type="button" class="btn btn-primary" id="publishFromPreview">
+                    <i class="bi bi-send me-2"></i>
+                    Looks Good, Publish!
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Character counters
+        const titleInput = document.getElementById('title');
+        const authorInput = document.getElementById('author');
+        const contentTextarea = document.getElementById('content');
+        
+        const titleCounter = document.getElementById('titleCounter');
+        const authorCounter = document.getElementById('authorCounter');
+        const contentCounter = document.getElementById('contentCounter');
+        
+        // Title counter
+        titleInput.addEventListener('input', function() {
+            const remaining = 200 - this.value.length;
+            titleCounter.textContent = `${remaining} characters remaining`;
+            updateCounterColor(titleCounter, remaining, 200);
+        });
+        
+        // Author counter
+        authorInput.addEventListener('input', function() {
+            const remaining = 100 - this.value.length;
+            authorCounter.textContent = `${remaining} characters remaining`;
+            updateCounterColor(authorCounter, remaining, 100);
+        });
+        
+        // Content counter
+        contentTextarea.addEventListener('input', function() {
+            const count = this.value.length;
+            contentCounter.textContent = `${count} characters`;
+            
+            // Auto-resize textarea
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+        
+        function updateCounterColor(element, remaining, total) {
+            element.classList.remove('text-warning', 'text-danger');
+            
+            if (remaining < total * 0.2) {
+                element.classList.add('text-warning');
+            }
+            if (remaining < total * 0.05) {
+                element.classList.add('text-danger');
+                element.classList.remove('text-warning');
+            }
+        }
+        
+        // Preview functionality
+        const previewBtn = document.getElementById('previewBtn');
+        const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+        
+        previewBtn.addEventListener('click', function() {
+            const title = titleInput.value;
+            const author = authorInput.value;
+            const content = contentTextarea.value;
+            
+            if (!title || !author || !content) {
+                alert('Please fill in all required fields before previewing.');
+                return;
+            }
+            
+            // Update preview modal content
+            document.getElementById('previewTitle').textContent = title;
+            document.getElementById('previewAuthor').textContent = author;
+            document.getElementById('previewDate').textContent = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('previewContentText').innerHTML = content.replace(/\n/g, '<br>');
+            
+            previewModal.show();
+        });
+        
+        // Publish from preview
+        document.getElementById('publishFromPreview').addEventListener('click', function() {
+            previewModal.hide();
+            document.getElementById('createPostForm').submit();
+        });
+        
+        // Form validation
+        const form = document.getElementById('createPostForm');
+        form.addEventListener('submit', function(e) {
+            const title = titleInput.value.trim();
+            const author = authorInput.value.trim();
+            const content = contentTextarea.value.trim();
+            
+            if (!title || !author || !content) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            if (title.length > 200) {
+                e.preventDefault();
+                alert('Title must be 200 characters or less.');
+                titleInput.focus();
+                return;
+            }
+            
+            if (author.length > 100) {
+                e.preventDefault();
+                alert('Author name must be 100 characters or less.');
+                authorInput.focus();
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="bi bi-arrow-clockwise spin me-2"></i>Publishing...';
+            submitBtn.disabled = true;
+            
+            // If validation passes, allow form submission
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 3000);
+        });
+        
+        // Auto-save to localStorage (optional enhancement)
+        function autoSave() {
+            const postData = {
+                title: titleInput.value,
+                author: authorInput.value,
+                content: contentTextarea.value,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('draft_post', JSON.stringify(postData));
+        }
+        
+        // Load draft on page load
+        function loadDraft() {
+            const draft = localStorage.getItem('draft_post');
+            if (draft) {
+                const postData = JSON.parse(draft);
+                // Only load if draft is less than 24 hours old
+                if (Date.now() - postData.timestamp < 24 * 60 * 60 * 1000) {
+                    if (confirm('Found a saved draft. Would you like to restore it?')) {
+                        titleInput.value = postData.title || '';
+                        authorInput.value = postData.author || '';
+                        contentTextarea.value = postData.content || '';
+                        
+                        // Trigger input events to update counters
+                        titleInput.dispatchEvent(new Event('input'));
+                        authorInput.dispatchEvent(new Event('input'));
+                        contentTextarea.dispatchEvent(new Event('input'));
+                    }
+                }
+            }
+        }
+        
+        // Auto-save every 30 seconds
+        [titleInput, authorInput, contentTextarea].forEach(input => {
+            input.addEventListener('input', () => {
+                clearTimeout(window.autoSaveTimeout);
+                window.autoSaveTimeout = setTimeout(autoSave, 30000);
+            });
+        });
+        
+        // Load draft on page load
+        loadDraft();
+        
+        // Clear draft on successful submission
+        form.addEventListener('submit', function() {
+            localStorage.removeItem('draft_post');
+        });
+    });
+</script>
+
+<style>
+    .spin {
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .preview-text {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #333;
+    }
+    
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    textarea.form-control {
+        min-height: 200px;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,452 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Post: {{ post.title }} - FastAPI Blog{% endblock %}
+
+{% block description %}Edit your blog post: {{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <!-- Breadcrumb Navigation -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="/" class="text-decoration-none">
+                        <i class="bi bi-house me-1"></i>Home
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="/post/{{ post.id }}" class="text-decoration-none">{{ post.title }}</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Edit</li>
+            </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="text-center mb-4">
+            <h1 class="display-6 fw-bold text-primary">
+                <i class="bi bi-pencil-square me-2"></i>
+                Edit Post
+            </h1>
+            <p class="lead text-muted">Update your post content and details</p>
+            <hr class="my-4">
+        </div>
+
+        <!-- Edit Post Form -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-journal-text me-2"></i>
+                        Editing: {{ post.title }}
+                    </h5>
+                    <small class="text-muted">
+                        <i class="bi bi-clock me-1"></i>
+                        Created: {{ post.created_at.strftime('%B %d, %Y') }}
+                    </small>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/edit-post/{{ post.id }}" id="editPostForm">
+                    <div class="row g-4">
+                        <!-- Post Title -->
+                        <div class="col-12">
+                            <label for="title" class="form-label fw-semibold">
+                                <i class="bi bi-card-heading me-1"></i>
+                                Post Title *
+                            </label>
+                            <input type="text" 
+                                   class="form-control form-control-lg" 
+                                   id="title" 
+                                   name="title" 
+                                   value="{{ post.title }}"
+                                   required 
+                                   placeholder="Enter an engaging title for your post"
+                                   maxlength="200"
+                                   autocomplete="off">
+                            <div class="form-text">
+                                <span id="titleCounter"></span>
+                            </div>
+                        </div>
+
+                        <!-- Author Name -->
+                        <div class="col-md-6">
+                            <label for="author" class="form-label fw-semibold">
+                                <i class="bi bi-person-circle me-1"></i>
+                                Author Name *
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="author" 
+                                   name="author" 
+                                   value="{{ post.author }}"
+                                   required 
+                                   placeholder="Your name"
+                                   maxlength="100"
+                                   autocomplete="name">
+                            <div class="form-text">
+                                <span id="authorCounter"></span>
+                            </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="col-12">
+                            <label for="content" class="form-label fw-semibold">
+                                <i class="bi bi-journal-text me-1"></i>
+                                Post Content *
+                            </label>
+                            <textarea class="form-control" 
+                                      id="content" 
+                                      name="content" 
+                                      rows="12" 
+                                      required 
+                                      placeholder="Write your post content here..."
+                                      style="resize: vertical;">{{ post.content }}</textarea>
+                            <div class="form-text">
+                                <span id="contentCounter"></span>
+                                <span class="ms-3">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Tip: Use line breaks to create paragraphs
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Change Summary (Optional) -->
+                        <div class="col-12">
+                            <label for="changeSummary" class="form-label fw-semibold">
+                                <i class="bi bi-list-ul me-1"></i>
+                                Summary of Changes (Optional)
+                            </label>
+                            <textarea class="form-control" 
+                                      id="changeSummary" 
+                                      name="changeSummary" 
+                                      rows="2" 
+                                      placeholder="Briefly describe what you changed in this update..."
+                                      maxlength="200"></textarea>
+                            <div class="form-text">
+                                Help readers understand what's new in this version
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="col-12">
+                            <div class="d-flex gap-3 justify-content-between">
+                                <div>
+                                    <a href="/post/{{ post.id }}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left me-2"></i>
+                                        Cancel
+                                    </a>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-outline-info" id="previewBtn">
+                                        <i class="bi bi-eye me-2"></i>
+                                        Preview Changes
+                                    </button>
+                                    <button type="submit" class="btn btn-warning text-dark">
+                                        <i class="bi bi-check-circle me-2"></i>
+                                        Update Post
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Version History Info -->
+        <div class="card border-0 bg-light mt-4">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="bi bi-clock-history text-info me-2"></i>
+                    Post History
+                </h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <small class="text-muted">
+                            <strong>Originally created:</strong><br>
+                            {{ post.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        </small>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted">
+                            <strong>Last updated:</strong><br>
+                            {% if post.updated_at %}
+                                {{ post.updated_at.strftime('%B %d, %Y at %I:%M %p') }}
+                            {% else %}
+                                Never updated
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Editing Tips -->
+        <div class="card border-0 bg-light mt-4">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="bi bi-lightbulb text-warning me-2"></i>
+                    Editing Tips
+                </h6>
+                <ul class="card-text small mb-0">
+                    <li>Review your changes carefully before updating</li>
+                    <li>Use the preview feature to see how your post will look</li>
+                    <li>Consider adding a summary of changes for your readers</li>
+                    <li>Major updates might benefit from a note to existing readers</li>
+                    <li>Check that links and formatting still work correctly</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewModalLabel">
+                    <i class="bi bi-eye me-2"></i>
+                    Updated Post Preview
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>
+                    This is how your updated post will appear to readers
+                </div>
+                <article class="preview-content">
+                    <h2 id="previewTitle" class="text-primary mb-3"></h2>
+                    <div class="text-muted mb-3">
+                        <i class="bi bi-person-circle me-1"></i>
+                        By <strong id="previewAuthor"></strong>
+                        <span class="mx-2">•</span>
+                        <i class="bi bi-calendar-event me-1"></i>
+                        <span id="previewDate"></span>
+                        <span class="mx-2">•</span>
+                        <i class="bi bi-pencil me-1"></i>
+                        <small class="text-success">Updated: <span id="previewUpdateDate"></span></small>
+                    </div>
+                    <div id="previewContentText" class="preview-text"></div>
+                </article>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-pencil me-2"></i>
+                    Continue Editing
+                </button>
+                <button type="button" class="btn btn-warning text-dark" id="updateFromPreview">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Looks Good, Update!
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Character counters
+        const titleInput = document.getElementById('title');
+        const authorInput = document.getElementById('author');
+        const contentTextarea = document.getElementById('content');
+        
+        const titleCounter = document.getElementById('titleCounter');
+        const authorCounter = document.getElementById('authorCounter');
+        const contentCounter = document.getElementById('contentCounter');
+        
+        // Initialize counters
+        updateTitleCounter();
+        updateAuthorCounter();
+        updateContentCounter();
+        
+        // Title counter
+        titleInput.addEventListener('input', updateTitleCounter);
+        
+        function updateTitleCounter() {
+            const remaining = 200 - titleInput.value.length;
+            titleCounter.textContent = `${remaining} characters remaining`;
+            updateCounterColor(titleCounter, remaining, 200);
+        }
+        
+        // Author counter
+        authorInput.addEventListener('input', updateAuthorCounter);
+        
+        function updateAuthorCounter() {
+            const remaining = 100 - authorInput.value.length;
+            authorCounter.textContent = `${remaining} characters remaining`;
+            updateCounterColor(authorCounter, remaining, 100);
+        }
+        
+        // Content counter
+        contentTextarea.addEventListener('input', updateContentCounter);
+        
+        function updateContentCounter() {
+            const count = contentTextarea.value.length;
+            contentCounter.textContent = `${count} characters`;
+            
+            // Auto-resize textarea
+            contentTextarea.style.height = 'auto';
+            contentTextarea.style.height = (contentTextarea.scrollHeight) + 'px';
+        }
+        
+        function updateCounterColor(element, remaining, total) {
+            element.classList.remove('text-warning', 'text-danger');
+            
+            if (remaining < total * 0.2) {
+                element.classList.add('text-warning');
+            }
+            if (remaining < total * 0.05) {
+                element.classList.add('text-danger');
+                element.classList.remove('text-warning');
+            }
+        }
+        
+        // Preview functionality
+        const previewBtn = document.getElementById('previewBtn');
+        const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+        
+        previewBtn.addEventListener('click', function() {
+            const title = titleInput.value;
+            const author = authorInput.value;
+            const content = contentTextarea.value;
+            
+            if (!title || !author || !content) {
+                alert('Please fill in all required fields before previewing.');
+                return;
+            }
+            
+            // Update preview modal content
+            document.getElementById('previewTitle').textContent = title;
+            document.getElementById('previewAuthor').textContent = author;
+            document.getElementById('previewDate').textContent = '{{ post.created_at.strftime("%B %d, %Y at %I:%M %p") }}';
+            document.getElementById('previewUpdateDate').textContent = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('previewContentText').innerHTML = content.replace(/\n/g, '<br>');
+            
+            previewModal.show();
+        });
+        
+        // Update from preview
+        document.getElementById('updateFromPreview').addEventListener('click', function() {
+            previewModal.hide();
+            document.getElementById('editPostForm').submit();
+        });
+        
+        // Form validation
+        const form = document.getElementById('editPostForm');
+        form.addEventListener('submit', function(e) {
+            const title = titleInput.value.trim();
+            const author = authorInput.value.trim();
+            const content = contentTextarea.value.trim();
+            
+            if (!title || !author || !content) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            if (title.length > 200) {
+                e.preventDefault();
+                alert('Title must be 200 characters or less.');
+                titleInput.focus();
+                return;
+            }
+            
+            if (author.length > 100) {
+                e.preventDefault();
+                alert('Author name must be 100 characters or less.');
+                authorInput.focus();
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="bi bi-arrow-clockwise spin me-2"></i>Updating...';
+            submitBtn.disabled = true;
+            
+            // If validation passes, allow form submission
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 3000);
+        });
+        
+        // Track changes for unsaved changes warning
+        const originalValues = {
+            title: titleInput.value,
+            author: authorInput.value,
+            content: contentTextarea.value
+        };
+        
+        let hasUnsavedChanges = false;
+        
+        [titleInput, authorInput, contentTextarea].forEach(input => {
+            input.addEventListener('input', function() {
+                hasUnsavedChanges = (
+                    titleInput.value !== originalValues.title ||
+                    authorInput.value !== originalValues.author ||
+                    contentTextarea.value !== originalValues.content
+                );
+            });
+        });
+        
+        // Warn about unsaved changes
+        window.addEventListener('beforeunload', function(e) {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        });
+        
+        // Clear unsaved changes flag on form submission
+        form.addEventListener('submit', function() {
+            hasUnsavedChanges = false;
+        });
+        
+        // Initial textarea resize
+        updateContentCounter();
+    });
+</script>
+
+<style>
+    .spin {
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .preview-text {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #333;
+    }
+    
+    .form-control:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    }
+    
+    textarea.form-control {
+        min-height: 200px;
+    }
+    
+    .card-header.bg-warning {
+        border-bottom: 1px solid rgba(0,0,0,0.125);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,50 @@
+# FastAPI Blog Application Requirements
+# Core FastAPI framework and dependencies
+
+# FastAPI - Modern, fast web framework for building APIs
+fastapi==0.104.1
+
+# Uvicorn - ASGI server implementation for FastAPI
+uvicorn[standard]==0.24.0
+
+# Database dependencies
+sqlalchemy==2.0.23          # SQL toolkit and Object-Relational Mapping (ORM) library
+alembic==1.12.1             # Database migration tool for SQLAlchemy
+
+# Template rendering
+jinja2==3.1.2               # Modern and designer-friendly templating language
+
+# Form handling and file uploads
+python-multipart==0.0.6     # Required for form data and file uploads
+
+# Data validation and serialization
+pydantic==2.5.0             # Data validation using Python type hints
+
+# Development and testing (optional, but recommended)
+pytest==7.4.3              # Testing framework
+pytest-asyncio==0.21.1     # Async support for pytest
+httpx==0.25.2               # HTTP client for testing FastAPI applications
+
+# Code quality (optional)
+black==23.11.0              # Code formatter
+flake8==6.1.0               # Linting tool
+isort==5.12.0               # Import sorting
+
+# Additional utilities
+python-dotenv==1.0.0        # Load environment variables from .env file (for configuration)
+
+# Production server (alternative to uvicorn)
+gunicorn==21.2.0            # Python WSGI HTTP Server for UNIX (for production deployment)
+
+# Static file serving enhancement (optional)
+aiofiles==23.2.1            # File operations for async/await
+
+# Security enhancements (for production)
+passlib[bcrypt]==1.7.4      # Password hashing (if you add authentication later)
+python-jose[cryptography]==3.3.0  # JWT token handling (if you add authentication later)
+
+# Note: For production deployment, you might also consider:
+# - redis for caching
+# - celery for background tasks  
+# - pillow for image processing
+# - email libraries for notifications

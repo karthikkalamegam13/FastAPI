@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Home - FastAPI Blog{% endblock %}
+
+{% block description %}Browse all blog posts on FastAPI Blog{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <!-- Page Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary">Welcome to FastAPI Blog</h1>
+            <p class="lead text-muted">Discover amazing stories and insights from our community</p>
+            <hr class="my-4">
+        </div>
+        
+        <!-- Create Post Call-to-Action (when no posts exist) -->
+        {% if not posts %}
+        <div class="text-center py-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body py-5">
+                    <i class="bi bi-journal-plus display-1 text-muted mb-3"></i>
+                    <h3 class="card-title">No Posts Yet</h3>
+                    <p class="card-text text-muted mb-4">
+                        Be the first to share your thoughts and create the first blog post!
+                    </p>
+                    <a href="/create-post" class="btn btn-primary btn-lg">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Create First Post
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Blog Posts List -->
+        {% if posts %}
+        <div class="row g-4">
+            {% for post in posts %}
+            <div class="col-12">
+                <article class="card h-100 shadow-sm border-0 post-card">
+                    <div class="card-body">
+                        <!-- Post Header -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h2 class="card-title h4 mb-2">
+                                    <a href="/post/{{ post.id }}" class="text-decoration-none text-dark post-title-link">
+                                        {{ post.title }}
+                                    </a>
+                                </h2>
+                                <div class="text-muted small">
+                                    <i class="bi bi-person-circle me-1"></i>
+                                    By <strong>{{ post.author }}</strong>
+                                    <span class="mx-2">•</span>
+                                    <i class="bi bi-calendar-event me-1"></i>
+                                    {{ post.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Post Summary -->
+                        <p class="card-text text-muted mb-3">{{ post.summary }}</p>
+                        
+                        <!-- Post Actions -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="/post/{{ post.id }}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-arrow-right me-1"></i>
+                                Read More
+                            </a>
+                            
+                            <!-- Post Management Buttons -->
+                            <div class="btn-group" role="group">
+                                <a href="/edit-post/{{ post.id }}" class="btn btn-outline-secondary btn-sm" title="Edit Post">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <form method="post" action="/delete-post/{{ post.id }}" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm btn-delete" title="Delete Post">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Post Footer with Stats -->
+                    <div class="card-footer bg-transparent border-top-0">
+                        <small class="text-muted">
+                            <i class="bi bi-chat-dots me-1"></i>
+                            {{ post.id }} <!-- This will be replaced with actual comment count in future versions -->
+                            {% if post.id == 1 %}comment{% else %}comments{% endif %}
+                        </small>
+                    </div>
+                </article>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination (for future implementation) -->
+        <nav aria-label="Blog posts pagination" class="mt-5">
+            <div class="d-flex justify-content-center">
+                <!-- Pagination will be implemented when needed -->
+                <p class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Showing all {{ posts|length }} posts
+                </p>
+            </div>
+        </nav>
+        {% endif %}
+        
+        <!-- Call-to-Action Section -->
+        {% if posts %}
+        <div class="mt-5 py-4">
+            <div class="card bg-primary text-white border-0">
+                <div class="card-body text-center">
+                    <h3 class="card-title">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        Have Something to Share?
+                    </h3>
+                    <p class="card-text mb-3">
+                        Join our community and share your thoughts, experiences, and insights with readers around the world.
+                    </p>
+                    <a href="/create-post" class="btn btn-light btn-lg">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Write a New Post
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add hover effects and animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Smooth hover effects for post cards
+        const postCards = document.querySelectorAll('.post-card');
+        postCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.classList.add('shadow-lg');
+                this.style.transform = 'translateY(-2px)';
+                this.style.transition = 'all 0.3s ease';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.classList.remove('shadow-lg');
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Highlight post titles on hover
+        const postTitleLinks = document.querySelectorAll('.post-title-link');
+        postTitleLinks.forEach(link => {
+            link.addEventListener('mouseenter', function() {
+                this.style.color = '#0d6efd';
+                this.style.transition = 'color 0.2s ease';
+            });
+            
+            link.addEventListener('mouseleave', function() {
+                this.style.color = '';
+            });
+        });
+    });
+</script>
+{% endblock %}
